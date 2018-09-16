@@ -5,56 +5,40 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Urna {
-	private Date voteDate;
-	private List<Voto> votos;
+	public Date voteDate;
+	private HashMap<String, String> votoMap = new HashMap<String, String>();
+	private HashMap<String, Integer> votosCount = new HashMap<String, Integer>();
 
 	public Urna() {
 		voteDate = new Date();
-		votos = new ArrayList<Voto>();
 	}
 	
-	public Date getVoteDate() {
-		return voteDate;
-	}
-	
-	public List<Voto> getVotos() {
-		return votos;
-	}
-	public void setVotos(List<Voto> votos) {
-		this.votos = votos;
-	}
-	
-	public void addVoto(Voto v) {
-		votos.add(v);
-	}
-
-	public boolean profJaVotou(Profissional p) {
-		for(Voto voto:votos) {
-			if(voto.getProfissional() == p) {
-				return true;
-			}
+	public String addVoto(String votante, String rest) {
+		if(votoMap.containsKey(votante)) {
+			return (votante+" já votou hoje");
+		}else {
+			votoMap.put(votante, rest);
+			if(votosCount.containsKey(rest)) {
+		        Integer count = (Integer)votosCount.get(rest);
+		        votosCount.put(rest, new Integer(count.intValue() + 1));
+		      } else {
+		    	  votosCount.put(rest, new Integer(1));
+		      }
+			
 		}
-		return false;
+		return votante+" votou!";
 		
 	}
 	
+	public String getGanhador() {
+		return votosCount.entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).get().getKey();
+	}
+	
 	public String apuracaoVotos() {
-		HashMap<String, Integer> map = new HashMap<String, Integer>();
-	      String word ;
-		for(Voto voto:votos) {
-			word = voto.getRestaurante().getName();
-			if(map.containsKey(word)) {
-		        Integer count = (Integer)map.get(word);
-		        map.put(word, new Integer(count.intValue() + 1));
-		      } else {
-		        map.put(word, new Integer(1));
-		      }
-		}
-		ArrayList<String> arraylist = new ArrayList<String>(map.keySet());
-	    Collections.sort(arraylist);
-	    String key = (String)arraylist.get(0);
-	    Integer count = (Integer)map.get(key);
-	    return count+" "+key;
+		
+		
+		return getGanhador()+" votos: "+votosCount.entrySet().stream().max((entry1, entry2) -> entry1.getValue() > entry2.getValue() ? 1 : -1).get().getValue();
+
 	}
 
 }
